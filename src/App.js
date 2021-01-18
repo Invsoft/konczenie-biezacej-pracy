@@ -1,6 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
-import RaportujZakonczonaPrace from './raportowanieZakonczonychPrac/RaportujZakonczonaPrace'
+import {RaportujZakonczonaPrace} from './raportowanieZakonczonychPrac/RaportujZakonczonaPrace'
 
 function App() {
   return (
