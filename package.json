@@ -1,28 +1,33 @@
 {
   "name": "raportowanie-zakonczonych-prac",
   "homepage": "http://proedims:8080/eoffice/react/raportowanie_zakonczonych_prac",
-  "proxy": "http://proedims:8080", 
+  "proxy": "http://proedims:8080",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
+    "antd": "^4.10.3",
+    "classnames": "^2.2.6",
+    "preval.macro": "^5.0.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
+    "react-intl": "^5.10.16",
     "react-scripts": "4.0.1",
-    "web-vitals": "^0.2.4",
-    "preval.macro": "^5.0.0",
-    "classnames": "^2.2.6",
-    "rxjs": "^6.6.3", 
+    "react-toastify": "^6.2.0",
+    "rxjs": "^6.6.3",
     "semantic-ui-css": "2.4.1",
     "semantic-ui-react": "^2.0.2",
-    "react-intl": "^5.10.16" 
+    "web-vitals": "^0.2.4"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test"
+    "test": "react-scripts test",
+    "send-build-to-proedims": "node send-build-to-proedims.js ",
+    "test-add": "node add.js ",
+    "say-hello": "echo 'Hello World'"
   },
   "eslintConfig": {
     "extends": [

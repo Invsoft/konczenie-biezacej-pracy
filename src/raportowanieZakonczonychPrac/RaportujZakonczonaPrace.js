@@ -1,11 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { IntlProvider } from 'react-intl'
 import preval from 'preval.macro';
 import _ from 'lodash'
+import moment from 'moment';
 import './RaportujZakonczonaPrace.css'
 import { messagesOf } from './../tools/i18nConfig'
-import { consts} from './consts'
-import { PanelSemantic} from './PanelSemantic';
+import { consts, DataProvider } from './DataProvider'
+import { PanelSemantic } from './PanelSemantic';
+import { CzasPracy } from "./CzasPracy";
 
 export const RaportujZakonczonaPrace = () => {
     const build_date = preval`module.exports = new Date();`
@@ -15,24 +19,58 @@ export const RaportujZakonczonaPrace = () => {
     const [pracownicy, setPracownicy] = useState([])
     const [isLoading, setIsLoading] = useState(false)
     const [pracownik, setPracownik] = useState(null)
+
     const [zlecenieWybrane, setZlecenieWybrane] = useState(null)
     const [id_order_production, setId_order_production] = useState(0)
+    const refZlecenie = useRef(null);
 
     const [elementyLoading, setElementyLoading] = useState(false)
     const [elementyZlecenia, setElementyZlecenia] = useState([])
+    const [elementWybrany, setElementWybrany] = useState(null)
+    const [id_element, setId_element] = useState(0)
+    const refElement = useRef(null);
 
+    const [operacjeLoading, setOperacjeLoading] = useState(false)
+    const [operacje, setOperacje] = useState([])
+    const [operacjaWybrana, setOperacjaWybrana] = useState(null)
+    const refOperacja = useRef(null);
+
+    const [data, setData] = useState(null)
+    const refDate = useRef(null);
+    const [godzinaStart, setGodzinaStart] = useState(null)
+    const [godzinaEnd, setGodzinaEnd] = useState(null)
+    const [przepracowano, setPrzepracowano] = useState(null)
+
+    const [moznaZapisac, setMoznaZapisac] = useState(false)
 
     useEffect(() => {
         loadPracownicy()
     }, [])
     useEffect(() => {
-        if (id_order_production>0)
-        loadElementyZlecenia(id_order_production)
+        setElementyZlecenia([])
+        setElementWybrany(null)
+        setId_element(0)
+        setOperacje([])
+        setOperacjaWybrana(null)
+        if (id_order_production > 0)
+            loadElementyZlecenia(id_order_production)
     }, [id_order_production])
+    useEffect(() => {
+        setOperacje([])
+        setOperacjaWybrana(null)
+        if (id_order_production > 0 && id_element > 0)
+            loadOperacje(id_order_production, id_element)
+    }, [id_order_production, id_element])
+    useEffect(() => {
+        const zdefiniowaneObiekty = pracownik && pracownik.id > 0 && operacjaWybrana && data && godzinaStart && godzinaEnd
+        const canSave = !!zdefiniowaneObiekty
+        console.log('canSave', canSave)
+        setMoznaZapisac(canSave)
+    }, [pracownik, operacjaWybrana, data, godzinaStart, godzinaEnd])
 
     async function loadPracownicy() {
         setIsLoading(true)
-        const jsonName = consts.ENDPOINT_URL+'?action=pobierz_pracownikow_json'
+        const jsonName = consts.ENDPOINT_URL + '?action=pobierz_pracownikow_json'
         const response = await fetch(jsonName);
         const myJson = await response.json();
         //console.log('myJson', myJson)
@@ -42,27 +80,138 @@ export const RaportujZakonczonaPrace = () => {
 
     async function loadElementyZlecenia(id_order_production) {
         setElementyLoading(true)
-        const jsonName = consts.ENDPOINT_URL + '?pobierz_elementy_zlecenia_json&id_order_production=' + id_order_production
+        const jsonName = consts.ENDPOINT_URL + '?action=pobierz_elementy_zlecenia_json&id_order_production=' + id_order_production
         const response = await fetch(jsonName);
         const myJson = await response.json();
         setElementyLoading(false)
         setElementyZlecenia(myJson)
+        refElement.current.tryOpen()
+    }
+
+    async function loadOperacje(id_order_production, id_element) {
+        setOperacjeLoading(true)
+        const jsonName = consts.ENDPOINT_URL + '?action=pobierz_operacje_zlecenia_json&id_order_production=' + id_order_production +
+            '&id_element=' + id_element
+        const response = await fetch(jsonName);
+        const myJson = await response.json();
+        setOperacjeLoading(false)
+        setOperacje(myJson)
+        refOperacja.current.tryOpen()
+    }
+
+    function momentZERO() {
+        return moment("2021-01-01 00:00", "yyyy-MM-DD HH:mm")
+    }
+    function wyliczPrzepracowano(start, end) {
+        if (start && end) {
+            const diff = moment.duration(end.diff(start))
+            const przepracowano = momentZERO().add(diff.asMinutes(), 'minutes')
+            setPrzepracowano(przepracowano)
+        }
     }
 
     const callbacks = {
         setLoadind: (loading) => setIsLoading(loading),
-        wybierzPracownika: (id) => {
-            console.log('wybierzPracownika id', id)
-            const index = _.findIndex(pracownicy, { 'id': id });
-            if (index > -1) {
-                setPracownik(pracownicy[index])
-            }
+        wybierzPracownika: (pracownik) => {
+            // console.log('wybierzPracownika id', id)
+            // const index = _.findIndex(pracownicy, { 'id': id });
+            // if (index > -1) {
+            //     setPracownik(pracownicy[index])
+            // }
             console.log('wybierzPracownika ', pracownik)
-            setIsLoading(false)
+            setPracownik(pracownik)
+            if (pracownik) document.getElementById('zlecenie_search').focus()
         },
         wybierzZlecenie: (zlecenie) => {
             setZlecenieWybrane(zlecenie)
             setId_order_production(zlecenie.id)
+            //refElement.current.focus()
+            //console.log('wybierzZlecenie refElement', refElement)
+        },
+        wybierzElement: (element) => {
+            setElementWybrany(element)
+            setId_element(element.id)
+        },
+        wybierzOperacje: (operacja) => {
+            setOperacjaWybrana(operacja)
+            refDate.current.focus()
+        },
+        wybierzDate: (dzien) => {
+            setData(dzien)
+        },
+        wybierzGodzineRozpoczecia: (czas) => {
+            console.log('wybierzGodzineRozpoczecia', czas)
+            if (!moment.isMoment(czas)) {
+                setGodzinaStart(null)
+                setPrzepracowano(momentZERO())
+                return
+            }
+            const czasNormalized = moment("2021-01-01 " + czas.format("HH:mm"), "yyyy-MM-DD HH:mm")
+            setGodzinaStart(czasNormalized)
+            if (czasNormalized && godzinaEnd) {
+                if (czasNormalized.isAfter(godzinaEnd)){
+                    setGodzinaEnd(czasNormalized);
+                    setPrzepracowano(momentZERO())
+                } else {
+                    wyliczPrzepracowano(czasNormalized, godzinaEnd)
+                }
+            }
+        },
+        wybierzGodzineZakonczenia: (czas) => {
+            //console.log('wybierzGodzineZakonczenia godzinaStart', godzinaStart)
+            console.log('wybierzGodzineZakonczenia', czas)
+            if (!moment.isMoment(czas)) {
+                setGodzinaEnd(null)
+                setPrzepracowano(momentZERO())
+                return
+            }
+            const czasNormalized = moment("2021-01-01 " + czas.format("HH:mm"), "yyyy-MM-DD HH:mm")
+            setGodzinaEnd(czasNormalized)
+            if (godzinaStart && czasNormalized) {
+                if (czasNormalized.isBefore(godzinaStart)){
+                    setGodzinaStart(czasNormalized);
+                    setPrzepracowano(momentZERO())
+                } else {
+                    wyliczPrzepracowano(godzinaStart, czasNormalized)
+                }
+                 
+                //setPrzepracowano(moment(czasNormalized).subtract(godzinaStart));
+            }
+        },
+        wybierzPrzepracowano: (czas) => {
+            setPrzepracowano(czas)
+        },
+        zapiszPrace: () => {
+            setIsLoading(true)
+            DataProvider.wyslijNaSerwer(
+                {
+                    employeeId: pracownik.id,
+                    operacjaId: operacjaWybrana.id,
+                    date: data.format("yyyy-MM-DD"),
+                    start_task_time: godzinaStart.format("HH:mm") + ":00",
+                    end_task_time: godzinaEnd.format("HH:mm") + ":00",
+                },
+                fromServer => {
+                    wyswietlKomunikatBledu('sukces')
+                    setIsLoading(false)
+
+                    // if (fromServer.serverInfo && fromServer.serverInfo.cause) {
+                    //     toast.error(<span>Błąd: {fromServer.serverInfo.cause}</span>);
+                    // }
+                    // if (fromServer.serverInfo && fromServer.serverInfo.error === 'Nie znaleziono pracownika lub programu') {
+                    //     this.wyswietlLicznikIOdswiezStroneZa(4);
+                    // }
+                    // else {
+                    //     if (fromServer.wlasnieOdczytano === 'pracownik') {
+                    //         this.setState({ wlasnieOdczytanoPracownika: true })
+                    //         afterSecondsOf(3).subscribe(x => this.setState({ wlasnieOdczytanoPracownika: false }))
+                    //     }
+                    //     this.focusPoleTekstoweSkanowania();
+                    // }
+                }, error => {
+                    wyswietlKomunikatBledu(error)
+                    setIsLoading(false)
+                })
         },
     }
     const params = {
@@ -71,20 +220,64 @@ export const RaportujZakonczonaPrace = () => {
         pracownicy,
         pracownik,
         zlecenieWybrane,
+        id_order_production,
+        refZlecenie,
 
         elementyLoading,
         elementyZlecenia,
+        elementWybrany,
+        id_element,
+        refElement,
+
+        operacjeLoading,
+        operacje,
+        operacjaWybrana,
+        refOperacja,
+
+        refDate,
+        data,
+        godzinaStart,
+        godzinaEnd,
+        przepracowano,
+
+        moznaZapisac,
+    }
+    const wyswietlKomunikatBledu = error => {
+        toast.error(<span>Błąd: {trescKomunikatuBledu(error)}</span>);
+    }
+
+    const trescKomunikatuBledu = error => {
+        if (typeof error === 'undefined') return 'server_error'
+        const { error_message, errorCause } = error
+        const komunikatBledu = error_message || errorCause || ''
+        if (typeof komunikatBledu === 'object') {
+            komunikatBledu = 'server_error'
+        }
+        return komunikatBledu
     }
 
     return (
         <IntlProvider locale={lang} messages={messagesOf(lang)}>
-        <div className="mainPanel">
+            <div className="mainPanel">
                 <header id="main_header" data_build_date={build_date}>
                     Raportuj Zakonczoną Pracę
                 <span className="timestamp">{build_date.substr(0, 10)}</span>
-                </header> {pracownicy.length}
+                </header>
+                {data && data.format("yyyy-MM-DD")}
+                {' '}start {godzinaStart && godzinaStart.format("HH:mm")}
+                {' '}end {godzinaEnd && godzinaEnd.format("HH:mm")}
+                {' '}przepracowano {przepracowano && przepracowano.format("HH:mm")}
                 <PanelSemantic params={params} callbacks={callbacks} />
-        </div>
+                {/* <div className="div_czas_pracy">
+                    <CzasPracy params={params} callbacks={callbacks} />
+                </div> */}
+            </div>
+            <ToastContainer
+                position={toast.POSITION.TOP_RIGHT}
+                closeOnClick={false}
+                autoClose={6000}
+                hideProgressBar={true}
+            />
         </IntlProvider>
     )
 }

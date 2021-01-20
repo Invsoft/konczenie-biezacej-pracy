@@ -1,10 +1,11 @@
 import React from 'react';
-import { Search } from 'semantic-ui-react'
+import { Search, Button, Icon } from 'semantic-ui-react'
+import classNames from 'classnames/bind'
 import _ from 'lodash'
-import { consts } from './consts'
+import { consts } from './DataProvider'
 
 export const ZlecenieSearch = ({ params, callbacks }) => {
-    const { isLoading, zlecenieWybrane, pracownicy, pracownik } = params;
+    const { isLoading, zlecenieWybrane, refZlecenie, } = params;
     const [searchText, setSearchText] = React.useState('')
 
     const [zleceniaLoading, setZleceniaLoading] = React.useState(false)
@@ -28,35 +29,49 @@ export const ZlecenieSearch = ({ params, callbacks }) => {
         setSearchText(value)
         //filrtujPracownikow(pracownicy, value)
     }
-
+    const onSelect = (zlecenie) => {
+        callbacks.wybierzZlecenie(zlecenie)
+        setSearchText(zlecenie.index + ' ' + zlecenie.title)
+    }
+    const clearSelection = () => {
+        callbacks.wybierzZlecenie(null)
+        setSearchText('')
+    }
     const handleBlur = (e, data) => {
         console.log('ZlecenieSearch.handleBlur')
     }
     return (
-        <div className="zlecenie_fields">
-            <Search key="zlecSearch" className='zlecenie_search'
+        <div className={classNames(
+            {
+                'fields_group': true,
+                'fields_group_niepoprawne_dane': !zlecenieWybrane,
+            })}>
+            <Search key="zlecSearch" id='zlecenie_search' className='search_field'
                 loading={isLoading || zleceniaLoading} icon=''
-                onResultSelect={(e, data) =>
-                    callbacks.wybierzZlecenie(data.result)
-                }
-                onSearchChange={_.debounce(handleSearchChange, 500, { leading: true })}
+                ref={refZlecenie}
+                placeholder='Wpisz indeks lub tytuł...'
                 results={zleceniaLista}
                 resultRenderer={resultRenderer}
+                onSearchChange={_.debounce(handleSearchChange, 500, { leading: true })}
+                onResultSelect={(e, data) => onSelect(data.result)}
                 value={searchText}
-                placeholder='Wpisz indeks lub tytuł...'
                 onBlur={handleBlur}
             />
-            {/* onResultSelect={this.handleResultSelect}
-                onSearchChange={_.debounce(this.handleSearchChange, 500, { leading: true })}
-                resultRenderer={resultRenderer}
-                ref={this.searchRef} */}
-
-            {zlecenieWybrane && 
-            <div className='project_info'>
-                <span className='project_info_title'>{zlecenieWybrane.object_index}</span>
-                {zlecenieWybrane.title}
+            <Button icon onClick={(e, data) => clearSelection('')} disabled={!searchText.length > 0}>
+                <Icon name='remove circle' />
+            </Button>
+            <div className='search_status_info'>
+                {zlecenieWybrane ?
+                    <div>
+                        <Icon name="check" color='green' />
+                        {/* <span className='project_info_title'>{zlecenieWybrane.index}</span> {zlecenieWybrane.title} */}
+                    </div>
+                    :
+                    <div className="blad">
+                        {/* Brak */}
+                    </div>
+                }
             </div>
-}
         </div>
     )
 }

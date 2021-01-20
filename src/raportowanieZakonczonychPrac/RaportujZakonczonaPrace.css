@@ -11,3 +11,11 @@
     vertical-align: top;
     margin-left: 15px;
 }
+
+.div_czas_pracy {
+    width: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}

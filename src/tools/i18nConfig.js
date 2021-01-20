@@ -30,6 +30,8 @@ export const messages =
         { id: "ZAKONCZ", en: "FINISH", },
         { id: "Lista bieżących prac", en: "List of ongoing work", },
         { id: "Odświeżenie strony za", en: "Page refresh in", },
+        { id: "Czas pracy", en: "Work time", },
+        
     ]
 
 export const messagesOf = (lang) => {

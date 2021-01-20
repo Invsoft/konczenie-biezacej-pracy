@@ -9,12 +9,29 @@
 }
 
 .ui.search>.results .result .content.search_result {
-    width: 500px;
+    width: 600px;
 }
 
-/* .zlecenie_search>div {
-    width: 300px;
-} */
+.search_field>div {
+    width: 600px;
+}
+
+.fields_group {
+    display: flex;
+    border: 1px solid white;
+    align-items: center;
+}
+div.fields_group_niepoprawne_dane {
+    border: 1px solid #e0b4b4;
+}
+div.fields_group_niepoprawne_dane>.search_field>div.ui>input {
+    background-color: #faf1f1;
+}
+.search_status_info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
 .zlecenie_fields{
     display: flex;
