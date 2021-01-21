@@ -2,7 +2,7 @@
   "name": "raportowanie-zakonczonych-prac",
   "homepage": "http://proedims:8080/eoffice/react/raportowanie_zakonczonych_prac",
   "proxy": "http://proedims:8080",
-  "version": "0.9.4",
+  "version": "0.9.5",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.4",
