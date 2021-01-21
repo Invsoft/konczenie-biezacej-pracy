@@ -114,10 +114,9 @@ export const PanelSemantic = ({ params, callbacks }) => {
                                                 onChange={(date, dateString) => callbacks.wybierzGodzineRozpoczecia(date)}
                                                 value={godzinaStart}/>
                                             <StatusInfo poprawneDane={godzinaStart} />
-                                            {godzinaStart && godzinaStart.format("yyyy-MM-DD HH:mm:ss")}{' start'}
+                                            {/* {godzinaStart && godzinaStart.format("yyyy-MM-DD HH:mm:ss")}{' start'}
                                             <br />{godzinaEnd && godzinaEnd.format("yyyy-MM-DD HH:mm:ss")}{' end'} 
-                                            <br />{przepracowano && przepracowano.format("yyyy-MM-DD HH:mm:ss")}{' przepracowano'}
-                                            <br />{moment(godzinaEnd).subtract(godzinaStart).format("yyyy-MM-DD HH:mm:ss")}{' moment '}
+                                            <br />{przepracowano && przepracowano.format("yyyy-MM-DD HH:mm:ss")}{' przepracowano'} */}
                                         </div>
                                 </Table.Cell>
                             </Table.Row>
