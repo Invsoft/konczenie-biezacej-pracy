@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Modal, Button } from 'semantic-ui-react'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { IntlProvider } from 'react-intl'
@@ -9,12 +10,12 @@ import './RaportujZakonczonaPrace.css'
 import { messagesOf } from './../tools/i18nConfig'
 import { consts, DataProvider } from './DataProvider'
 import { PanelSemantic } from './PanelSemantic';
-import { CzasPracy } from "./CzasPracy";
 
 export const RaportujZakonczonaPrace = () => {
     const build_date = preval`module.exports = new Date();`
     const parsedUrl = new URL(window.location.href)
     const lang = parsedUrl.searchParams.get("lang") || "pl"
+    const [openModal, setOpenModal] = React.useState(false)
 
     const [pracownicy, setPracownicy] = useState([])
     const [isLoading, setIsLoading] = useState(false)
@@ -64,7 +65,7 @@ export const RaportujZakonczonaPrace = () => {
     useEffect(() => {
         const zdefiniowaneObiekty = pracownik && pracownik.id > 0 && operacjaWybrana && data && godzinaStart && godzinaEnd
         const canSave = !!zdefiniowaneObiekty
-        console.log('canSave', canSave)
+        //console.log('canSave', canSave)
         setMoznaZapisac(canSave)
     }, [pracownik, operacjaWybrana, data, godzinaStart, godzinaEnd])
 
@@ -107,6 +108,13 @@ export const RaportujZakonczonaPrace = () => {
             const diff = moment.duration(end.diff(start))
             const przepracowano = momentZERO().add(diff.asMinutes(), 'minutes')
             setPrzepracowano(przepracowano)
+        }
+    }
+    function wyliczCzasZakonczenia(start, przepracowano) {
+        if (start && przepracowano) {
+            const diff = moment.duration(przepracowano.diff(momentZERO()))
+            const zakonczono = moment(start).add(diff.asMinutes(), 'minutes')
+            setGodzinaEnd(zakonczono)
         }
     }
 
@@ -155,6 +163,10 @@ export const RaportujZakonczonaPrace = () => {
                 } else {
                     wyliczPrzepracowano(czasNormalized, godzinaEnd)
                 }
+                return
+            }
+            if (czasNormalized && przepracowano) {
+                wyliczCzasZakonczenia(czasNormalized, przepracowano)
             }
         },
         wybierzGodzineZakonczenia: (czas) => {
@@ -179,7 +191,16 @@ export const RaportujZakonczonaPrace = () => {
             }
         },
         wybierzPrzepracowano: (czas) => {
-            setPrzepracowano(czas)
+            if (!moment.isMoment(czas)) {
+                setPrzepracowano(null)
+                setPrzepracowano(momentZERO())
+                return
+            }
+            const czasNormalized = moment("2021-01-01 " + czas.format("HH:mm"), "yyyy-MM-DD HH:mm")
+            setPrzepracowano(czasNormalized)
+            if (godzinaStart && czasNormalized) {
+                wyliczCzasZakonczenia(godzinaStart, czasNormalized)
+            }
         },
         zapiszPrace: () => {
             setIsLoading(true)
@@ -192,7 +213,8 @@ export const RaportujZakonczonaPrace = () => {
                     end_task_time: godzinaEnd.format("HH:mm") + ":00",
                 },
                 fromServer => {
-                    wyswietlKomunikatBledu('sukces')
+                    console.log('zapiszPrace fromServer', fromServer)
+                    setOpenModal(true)
                     setIsLoading(false)
 
                     // if (fromServer.serverInfo && fromServer.serverInfo.cause) {
@@ -209,6 +231,7 @@ export const RaportujZakonczonaPrace = () => {
                     //     this.focusPoleTekstoweSkanowania();
                     // }
                 }, error => {
+                    console.log('zapiszPrace error', error)
                     wyswietlKomunikatBledu(error)
                     setIsLoading(false)
                 })
@@ -263,10 +286,10 @@ export const RaportujZakonczonaPrace = () => {
                     Raportuj Zakonczoną Pracę
                 <span className="timestamp">{build_date.substr(0, 10)}</span>
                 </header>
-                {data && data.format("yyyy-MM-DD")}
+                {/* {data && data.format("yyyy-MM-DD")}
                 {' '}start {godzinaStart && godzinaStart.format("HH:mm")}
                 {' '}end {godzinaEnd && godzinaEnd.format("HH:mm")}
-                {' '}przepracowano {przepracowano && przepracowano.format("HH:mm")}
+                {' '}przepracowano {przepracowano && przepracowano.format("HH:mm")} */}
                 <PanelSemantic params={params} callbacks={callbacks} />
                 {/* <div className="div_czas_pracy">
                     <CzasPracy params={params} callbacks={callbacks} />
@@ -278,6 +301,41 @@ export const RaportujZakonczonaPrace = () => {
                 autoClose={6000}
                 hideProgressBar={true}
             />
+            <Modal
+                //onClose={() => setOpenModal(false)}
+                onOpen={() => setOpenModal(true)}
+                open={openModal}
+                //trigger={<Button>Show Modal</Button>}
+            >
+                <Modal.Header>Zapisano pracę</Modal.Header>
+                {/* <Modal.Content image>
+                    <Image size='medium' src='https://react.semantic-ui.com/images/avatar/large/rachel.png' wrapped />
+                    <Modal.Description>
+                        <Header>Default Profile Image</Header>
+                        <p>
+                            We've found the following gravatar image associated with your e-mail
+                            address.
+          </p>
+                        <p>Is it okay to use this photo?</p>
+                    </Modal.Description>
+                </Modal.Content> */}
+                <Modal.Actions>
+                    <Button
+                        content="OK, zapisz kolejną pracę"
+                        labelPosition='right'
+                        icon='checkmark'
+                        onClick={() => { 
+                            setOpenModal(false); 
+                            window.location.assign('/eoffice/react/raportowanie_zakonczonych_prac/index.html');}}
+                        positive
+                    />
+                    <Button color='black' onClick={() => {
+                        setOpenModal(false);
+                        window.location.assign('/eoffice/production/raport_prac_zakonczonych.xml?action=list&refreshTree=false&go=false&changetree=false');}}>
+                        Powrót do listy
+                    </Button>
+                </Modal.Actions>
+            </Modal>
         </IntlProvider>
     )
 }

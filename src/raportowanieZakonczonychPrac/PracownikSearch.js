@@ -42,6 +42,7 @@ export const PracownikSearch = ({ params, callbacks }) => {
             <Search key="pracownikSearch" className='search_field'
                 loading={isLoading} icon=''
                 minCharacters={0}
+                placeholder='Wpisz nazwisko i wybierz z listy'
                 results={pracownicyFilter}
                 resultRenderer={resultRenderer}
                 onSearchChange={_.debounce(handleSearchChange, 500, { leading: true })}

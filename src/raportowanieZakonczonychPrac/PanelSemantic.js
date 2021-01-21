@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, Input, Button, Table, Container, Search, Header, Confirm, Icon, Segment, Item } from 'semantic-ui-react'
+import { Form, Button, Table, Container, Segment } from 'semantic-ui-react'
 import 'semantic-ui-css/semantic.min.css'
 import './PanelSemantic.css'
 import classNames from 'classnames/bind'
@@ -133,25 +133,25 @@ export const PanelSemantic = ({ params, callbacks }) => {
                                 {/* <Table.Cell>
                                 </Table.Cell> */}
                                     <Table.HeaderCell colSpan='2'>{/*  colSpan='2' */}
-                                        {moznaZapisac ? 'moznaZapisac' : 'NIEmoznaZapisac'}
+                                        {/* {moznaZapisac ? 'moznaZapisac' : 'NIEmoznaZapisac'} */}
                                         <Button color='teal' fluid size='large' disabled={!moznaZapisac} loading={isLoading} 
                                             onClick={(evt) => callbacks.zapiszPrace()}
                                             >Zapisz</Button>                                    
                                 </Table.HeaderCell>
                             </Table.Row>
-                            <Table.Row key='prace'>
+                            {/* <Table.Row key='prace'>
                                 <Table.Cell>
                                     Prace pracownika
                                 </Table.Cell>
                                 <Table.Cell>
-                                    {/* {pracownikOdczytany
+                                    {pracownikOdczytany
                                         ?
                                         <TrwajacePrace raportujZlecenie={raportujZlecenie}
                                             handlePrzerwijPrace={this.handlePrzerwijPrace}
                                             handleZakonczPrace={this.handleZakonczPrace} />
-                                        : ''} */}
+                                        : ''}
                                 </Table.Cell>
-                            </Table.Row>
+                            </Table.Row> */}
                         </Table.Body>
                     </Table>
                 </Segment>

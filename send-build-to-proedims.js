@@ -9,7 +9,7 @@ if (!fse.existsSync(destDir)){
 	console.log('mkdirSync ' + destDir)
 }
  
-fse.emptyDir(destDir, err => {
+fse.emptydirSync(destDir, err => {
   if (err) return console.error(err)
   console.log('emptyDir ' + destDir)
 })

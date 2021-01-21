@@ -9,7 +9,7 @@ export const ElementSearch = ({ params, callbacks }) => {
     const [searchText, setSearchText] = React.useState('')
 
     const handleSearchChange = (e, { value }) => {
-        setSearchText(value)
+        //setSearchText(value)
         //filrtujPracownikow(pracownicy, value)
     }
     const onSelect = (element) => {
@@ -31,7 +31,7 @@ export const ElementSearch = ({ params, callbacks }) => {
                 loading={isLoading || elementyLoading} icon=''
                 ref={refElement}
                 minCharacters={0}
-                placeholder='najpierw wskaż zlecenie'
+                placeholder={elementyZlecenia.length == 0 ? 'najpierw wskaż zlecenie' : 'kliknij by wybierać z listy'}
                 results={elementyZlecenia}
                 resultRenderer={resultRenderer}
                 onSearchChange={_.debounce(handleSearchChange, 500, { leading: true })}

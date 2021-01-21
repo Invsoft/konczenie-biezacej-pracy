@@ -9,7 +9,7 @@ export const OperacjaSearch = ({ params, callbacks }) => {
     const [searchText, setSearchText] = React.useState('')
 
     const handleSearchChange = (e, { value }) => {
-        setSearchText(value)
+        //setSearchText(value)
     }
     const onSelect = (operacja) => {
         callbacks.wybierzOperacje(operacja)
@@ -30,7 +30,7 @@ export const OperacjaSearch = ({ params, callbacks }) => {
                 loading={isLoading || operacjeLoading} icon=''
                 ref={refOperacja}
                 minCharacters={0}
-                placeholder='najpierw wskaż element'
+                placeholder={operacje.length == 0 ? 'najpierw wskaż element' : 'kliknij by wybierać z listy'}
                 results={operacje}
                 resultRenderer={resultRenderer}
                 onSearchChange={_.debounce(handleSearchChange, 500, { leading: true })}
@@ -44,7 +44,6 @@ export const OperacjaSearch = ({ params, callbacks }) => {
             {/* {operacjaWybrana &&
                 <div className='project_info'>
                 <span className='project_info_title'>{operacjaWybrana.value}</span>
-                {operacjaWybrana.title}
                 </div>
             } */}
         </div>

@@ -25,7 +25,6 @@ export const DataProvider = {
                 if (json.is_request_successful === false) {
                     const error_message = json.error_message
                     const errorCause = json.cause
-                    this.errorCause = json.cause
                     return Promise.reject({ error_message, errorCause })
                 }
                 const fromServer = json

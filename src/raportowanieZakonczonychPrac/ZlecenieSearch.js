@@ -49,7 +49,7 @@ export const ZlecenieSearch = ({ params, callbacks }) => {
             <Search key="zlecSearch" id='zlecenie_search' className='search_field'
                 loading={isLoading || zleceniaLoading} icon=''
                 ref={refZlecenie}
-                placeholder='Wpisz indeks lub tytuł...'
+                placeholder='Wpisz indeks lub tytuł (min 3 znaki)'
                 results={zleceniaLista}
                 resultRenderer={resultRenderer}
                 onSearchChange={_.debounce(handleSearchChange, 500, { leading: true })}
