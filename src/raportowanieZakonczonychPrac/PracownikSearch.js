@@ -4,7 +4,7 @@ import classNames from 'classnames/bind'
 import _ from 'lodash'
 
 export const PracownikSearch = ({ params, callbacks }) => {
-    const { isLoading, pracownicy, pracownik, wybierzPracownika, refZlecenie } = params;
+    const { isLoading, pracownicy, pracownik, } = params;
 
     const [pracownicyFilter, setPracownicyFilter] = React.useState(pracownicy)
     React.useEffect(() => { filrtujPracownikow(pracownicy, '')}, [pracownicy])

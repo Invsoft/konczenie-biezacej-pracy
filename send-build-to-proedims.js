@@ -9,19 +9,6 @@ if (!fse.existsSync(destDir)){
 	console.log('mkdirSync ' + destDir)
 }
  
-fse.emptydirSync(destDir, err => {
-  if (err) return console.error(err)
-  console.log('emptyDir ' + destDir)
-})
+fse.emptydirSync(destDir)
  
-// To copy a folder or file  
 fse.copySync(srcDir, destDir);
-/*
-, function (err) { //|___{ overwrite: true } // add if you want to replace existing folder or file with same name
-  if (err) {                 
-    console.error(err);      
-  } else {
-    console.log("success!");
-  }
-});
-*/

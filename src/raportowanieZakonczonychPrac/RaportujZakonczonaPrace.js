@@ -3,8 +3,7 @@ import { Modal, Button } from 'semantic-ui-react'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { IntlProvider } from 'react-intl'
-import preval from 'preval.macro';
-import _ from 'lodash'
+//import _ from 'lodash'
 import moment from 'moment';
 import './RaportujZakonczonaPrace.css'
 import { messagesOf } from './../tools/i18nConfig'
@@ -12,7 +11,6 @@ import { consts, DataProvider } from './DataProvider'
 import { PanelSemantic } from './PanelSemantic';
 
 export const RaportujZakonczonaPrace = () => {
-    const build_date = preval`module.exports = new Date();`
     const parsedUrl = new URL(window.location.href)
     const lang = parsedUrl.searchParams.get("lang") || "pl"
     const [openModal, setOpenModal] = React.useState(false)
@@ -238,7 +236,6 @@ export const RaportujZakonczonaPrace = () => {
         },
     }
     const params = {
-        build_date,
         isLoading: isLoading,
         pracownicy,
         pracownik,
@@ -272,7 +269,7 @@ export const RaportujZakonczonaPrace = () => {
     const trescKomunikatuBledu = error => {
         if (typeof error === 'undefined') return 'server_error'
         const { error_message, errorCause } = error
-        const komunikatBledu = error_message || errorCause || ''
+        let komunikatBledu = error_message || errorCause || ''
         if (typeof komunikatBledu === 'object') {
             komunikatBledu = 'server_error'
         }
@@ -282,18 +279,10 @@ export const RaportujZakonczonaPrace = () => {
     return (
         <IntlProvider locale={lang} messages={messagesOf(lang)}>
             <div className="mainPanel">
-                <header id="main_header" data_build_date={build_date}>
-                    Raportuj Zakonczoną Pracę
-                <span className="timestamp">{build_date.substr(0, 10)}</span>
+                <header id="main_header">
+                    Raportuj zakończoną pracę
                 </header>
-                {/* {data && data.format("yyyy-MM-DD")}
-                {' '}start {godzinaStart && godzinaStart.format("HH:mm")}
-                {' '}end {godzinaEnd && godzinaEnd.format("HH:mm")}
-                {' '}przepracowano {przepracowano && przepracowano.format("HH:mm")} */}
                 <PanelSemantic params={params} callbacks={callbacks} />
-                {/* <div className="div_czas_pracy">
-                    <CzasPracy params={params} callbacks={callbacks} />
-                </div> */}
             </div>
             <ToastContainer
                 position={toast.POSITION.TOP_RIGHT}

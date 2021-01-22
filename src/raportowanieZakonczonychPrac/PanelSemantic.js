@@ -9,16 +9,14 @@ import { PracownikSearch} from "./PracownikSearch";
 import { ZlecenieSearch } from './ZlecenieSearch' 
 import { ElementSearch } from './ElementSearch'
 import { OperacjaSearch } from "./OperacjaSearch";
-import { StatusInfo } from "./StatusInfo";
-import { CzasPracy } from "./CzasPracy";
-import { DatePicker, TimePicker } from 'antd';
-import 'antd/dist/antd.css';
-import moment from 'moment';
+import { Dzien, GodzinaRozpoczecia, GodzinaZakonczenia } from "./DataIGodziny";
+//import { StatusInfo } from "./StatusInfo";
+//import { DatePicker, TimePicker } from 'antd';
+//mport 'antd/dist/antd.css';
 import { from } from 'rxjs';
 
 export const PanelSemantic = ({ params, callbacks }) => {
-    const { build_date, isLoading, pracownik, id_order_production, id_element, operacjaWybrana, data, godzinaStart, godzinaEnd,
-        przepracowano, refDate, moznaZapisac } = params;
+    const { isLoading, pracownik, id_order_production, id_element, operacjaWybrana, moznaZapisac } = params;
     const pracownikOdczytany = pracownik;
     const zlecenieOdczytane = id_order_production > 0;
     const elementOdczytany = id_element > 0;
@@ -88,15 +86,7 @@ export const PanelSemantic = ({ params, callbacks }) => {
                                         Data{/* <Tlumaczenia id="Data" /> */}
                                 </Table.Cell>
                                 <Table.Cell>
-                                        <div className={classNames(
-                                            {
-                                                'fields_group': true,
-                                                'fields_group_niepoprawne_dane': !data,
-                                            })}>
-                                            <DatePicker bordered={false} placeholder='Wybierz datę' ref={refDate}
-                                                onChange={(date, dateString) => callbacks.wybierzDate(date)} />
-                                            <StatusInfo poprawneDane={data} />
-                                        </div>
+                                        <Dzien params={params} callbacks={callbacks} />
                                 </Table.Cell>
                             </Table.Row>
                             <Table.Row key='godzina_start'>
@@ -104,20 +94,7 @@ export const PanelSemantic = ({ params, callbacks }) => {
                                     Godzina rozpoczęcia
                                 </Table.Cell>
                                 <Table.Cell>
-                                        <div className={classNames(
-                                            {
-                                                'fields_group': true,
-                                                'fields_group_niepoprawne_dane': !godzinaStart,
-                                            })}>
-                                            <TimePicker bordered={false} format='HH:mm' placeholder='rozpoczęcie'
-                                                onSelect={(date) => callbacks.wybierzGodzineRozpoczecia(date)} 
-                                                onChange={(date, dateString) => callbacks.wybierzGodzineRozpoczecia(date)}
-                                                value={godzinaStart}/>
-                                            <StatusInfo poprawneDane={godzinaStart} />
-                                            {/* {godzinaStart && godzinaStart.format("yyyy-MM-DD HH:mm:ss")}{' start'}
-                                            <br />{godzinaEnd && godzinaEnd.format("yyyy-MM-DD HH:mm:ss")}{' end'} 
-                                            <br />{przepracowano && przepracowano.format("yyyy-MM-DD HH:mm:ss")}{' przepracowano'} */}
-                                        </div>
+                                        <GodzinaRozpoczecia params={params} callbacks={callbacks} />
                                 </Table.Cell>
                             </Table.Row>
                             <Table.Row key='data_czas'>
@@ -125,7 +102,7 @@ export const PanelSemantic = ({ params, callbacks }) => {
                                         Godzina zakończenia
                                 </Table.Cell>
                                 <Table.Cell>
-                                        <CzasPracy params={params} callbacks={callbacks} />
+                                        <GodzinaZakonczenia params={params} callbacks={callbacks} />
                                 </Table.Cell>
                             </Table.Row>
                             <Table.Row key='zapisz'>

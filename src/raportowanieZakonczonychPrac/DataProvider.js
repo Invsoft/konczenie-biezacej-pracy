@@ -28,9 +28,6 @@ export const DataProvider = {
                     return Promise.reject({ error_message, errorCause })
                 }
                 const fromServer = json
-                //console.log('RaportujLaser.wyslijNaSerwer fromServer', fromServer)
-                fromServer.idEmployee = fromServer.employee ? fromServer.employee.id : ''
-                fromServer.idProgramu = fromServer.kartaProgramu ? fromServer.kartaProgramu.idProgramu : ''
 
                 promiseHandler(fromServer)
             })
