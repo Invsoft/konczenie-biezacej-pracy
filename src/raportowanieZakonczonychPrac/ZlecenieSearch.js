@@ -14,6 +14,9 @@ export const ZlecenieSearch = ({ params, callbacks }) => {
     React.useEffect(() => {
         loadZlecenia(searchText)
     }, [searchText])
+    React.useEffect(() => {
+        if (zlecenieWybrane == null) setSearchText('')
+    }, [zlecenieWybrane])
 
     async function loadZlecenia(searchText) {
         setZleceniaLoading(true)

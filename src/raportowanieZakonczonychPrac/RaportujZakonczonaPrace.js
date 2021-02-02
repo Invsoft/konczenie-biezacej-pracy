@@ -1,32 +1,33 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Modal, Button } from 'semantic-ui-react'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { IntlProvider } from 'react-intl'
 //import _ from 'lodash'
-import moment from 'moment';
 import './RaportujZakonczonaPrace.css'
 import { messagesOf } from './../tools/i18nConfig'
 import { consts, DataProvider } from './DataProvider'
 import { PanelSemantic } from './PanelSemantic';
+import { ZapisanoPraceModal } from './ZapisanoPraceModal'
+//import { from } from 'rxjs';
 
 export const RaportujZakonczonaPrace = () => {
     const parsedUrl = new URL(window.location.href)
     const lang = parsedUrl.searchParams.get("lang") || "pl"
-    const [openModal, setOpenModal] = React.useState(false)
+
+    const [isLoading, setIsLoading] = useState(false)
+    const [isZapisanoPraceModalOpen, setZapisanoPraceModalOpen] = React.useState(false)
+    const [ostatnioZapisanaPraca, setOstatnioZapisanaPraca] = useState(null)
+    //const [zapisanePrace, setZapisanePrace] = useState([])
 
     const [pracownicy, setPracownicy] = useState([])
-    const [isLoading, setIsLoading] = useState(false)
     const [pracownik, setPracownik] = useState(null)
 
     const [zlecenieWybrane, setZlecenieWybrane] = useState(null)
-    const [id_order_production, setId_order_production] = useState(0)
     const refZlecenie = useRef(null);
 
     const [elementyLoading, setElementyLoading] = useState(false)
     const [elementyZlecenia, setElementyZlecenia] = useState([])
     const [elementWybrany, setElementWybrany] = useState(null)
-    const [id_element, setId_element] = useState(0)
     const refElement = useRef(null);
 
     const [operacjeLoading, setOperacjeLoading] = useState(false)
@@ -48,18 +49,17 @@ export const RaportujZakonczonaPrace = () => {
     useEffect(() => {
         setElementyZlecenia([])
         setElementWybrany(null)
-        setId_element(0)
         setOperacje([])
         setOperacjaWybrana(null)
-        if (id_order_production > 0)
-            loadElementyZlecenia(id_order_production)
-    }, [id_order_production])
+        if (zlecenieWybrane && zlecenieWybrane.id > 0)
+            loadElementyZlecenia(zlecenieWybrane.id)
+    }, [zlecenieWybrane])
     useEffect(() => {
         setOperacje([])
         setOperacjaWybrana(null)
-        if (id_order_production > 0 && id_element > 0)
-            loadOperacje(id_order_production, id_element)
-    }, [id_order_production, id_element])
+        if (zlecenieWybrane && zlecenieWybrane.id > 0 && elementWybrany)
+            loadOperacje(zlecenieWybrane.id, elementWybrany.id)
+    }, [zlecenieWybrane, elementWybrany])
     useEffect(() => {
         const zdefiniowaneObiekty = pracownik && pracownik.id > 0 && operacjaWybrana && data && godzinaStart && godzinaEnd
         const canSave = !!zdefiniowaneObiekty
@@ -98,26 +98,9 @@ export const RaportujZakonczonaPrace = () => {
         refOperacja.current.tryOpen()
     }
 
-    function momentZERO() {
-        return moment("2021-01-01 00:00", "yyyy-MM-DD HH:mm")
-    }
-    function wyliczPrzepracowano(start, end) {
-        if (start && end) {
-            const diff = moment.duration(end.diff(start))
-            const przepracowano = momentZERO().add(diff.asMinutes(), 'minutes')
-            setPrzepracowano(przepracowano)
-        }
-    }
-    function wyliczCzasZakonczenia(start, przepracowano) {
-        if (start && przepracowano) {
-            const diff = moment.duration(przepracowano.diff(momentZERO()))
-            const zakonczono = moment(start).add(diff.asMinutes(), 'minutes')
-            setGodzinaEnd(zakonczono)
-        }
-    }
-
     const callbacks = {
         setLoadind: (loading) => setIsLoading(loading),
+        setZapisanoPraceModalOpen: (open) => setZapisanoPraceModalOpen(open),
         wybierzPracownika: (pracownik) => {
             // console.log('wybierzPracownika id', id)
             // const index = _.findIndex(pracownicy, { 'id': id });
@@ -130,13 +113,9 @@ export const RaportujZakonczonaPrace = () => {
         },
         wybierzZlecenie: (zlecenie) => {
             setZlecenieWybrane(zlecenie)
-            setId_order_production(zlecenie.id)
-            //refElement.current.focus()
-            //console.log('wybierzZlecenie refElement', refElement)
         },
         wybierzElement: (element) => {
             setElementWybrany(element)
-            setId_element(element.id)
         },
         wybierzOperacje: (operacja) => {
             setOperacjaWybrana(operacja)
@@ -146,59 +125,13 @@ export const RaportujZakonczonaPrace = () => {
             setData(dzien)
         },
         wybierzGodzineRozpoczecia: (czas) => {
-            console.log('wybierzGodzineRozpoczecia', czas)
-            if (!moment.isMoment(czas)) {
-                setGodzinaStart(null)
-                setPrzepracowano(momentZERO())
-                return
-            }
-            const czasNormalized = moment("2021-01-01 " + czas.format("HH:mm"), "yyyy-MM-DD HH:mm")
-            setGodzinaStart(czasNormalized)
-            if (czasNormalized && godzinaEnd) {
-                if (czasNormalized.isAfter(godzinaEnd)){
-                    setGodzinaEnd(czasNormalized);
-                    setPrzepracowano(momentZERO())
-                } else {
-                    wyliczPrzepracowano(czasNormalized, godzinaEnd)
-                }
-                return
-            }
-            if (czasNormalized && przepracowano) {
-                wyliczCzasZakonczenia(czasNormalized, przepracowano)
-            }
+            setGodzinaStart(czas)
         },
         wybierzGodzineZakonczenia: (czas) => {
-            //console.log('wybierzGodzineZakonczenia godzinaStart', godzinaStart)
-            console.log('wybierzGodzineZakonczenia', czas)
-            if (!moment.isMoment(czas)) {
-                setGodzinaEnd(null)
-                setPrzepracowano(momentZERO())
-                return
-            }
-            const czasNormalized = moment("2021-01-01 " + czas.format("HH:mm"), "yyyy-MM-DD HH:mm")
-            setGodzinaEnd(czasNormalized)
-            if (godzinaStart && czasNormalized) {
-                if (czasNormalized.isBefore(godzinaStart)){
-                    setGodzinaStart(czasNormalized);
-                    setPrzepracowano(momentZERO())
-                } else {
-                    wyliczPrzepracowano(godzinaStart, czasNormalized)
-                }
-                 
-                //setPrzepracowano(moment(czasNormalized).subtract(godzinaStart));
-            }
+            setGodzinaEnd(czas)
         },
         wybierzPrzepracowano: (czas) => {
-            if (!moment.isMoment(czas)) {
-                setPrzepracowano(null)
-                setPrzepracowano(momentZERO())
-                return
-            }
-            const czasNormalized = moment("2021-01-01 " + czas.format("HH:mm"), "yyyy-MM-DD HH:mm")
-            setPrzepracowano(czasNormalized)
-            if (godzinaStart && czasNormalized) {
-                wyliczCzasZakonczenia(godzinaStart, czasNormalized)
-            }
+            setPrzepracowano(czas)
         },
         zapiszPrace: () => {
             setIsLoading(true)
@@ -212,41 +145,36 @@ export const RaportujZakonczonaPrace = () => {
                 },
                 fromServer => {
                     console.log('zapiszPrace fromServer', fromServer)
-                    setOpenModal(true)
+                    setZapisanoPraceModalOpen(true)
+                    setOstatnioZapisanaPraca(fromServer.zapisanaPraca)
                     setIsLoading(false)
-
-                    // if (fromServer.serverInfo && fromServer.serverInfo.cause) {
-                    //     toast.error(<span>Błąd: {fromServer.serverInfo.cause}</span>);
-                    // }
-                    // if (fromServer.serverInfo && fromServer.serverInfo.error === 'Nie znaleziono pracownika lub programu') {
-                    //     this.wyswietlLicznikIOdswiezStroneZa(4);
-                    // }
-                    // else {
-                    //     if (fromServer.wlasnieOdczytano === 'pracownik') {
-                    //         this.setState({ wlasnieOdczytanoPracownika: true })
-                    //         afterSecondsOf(3).subscribe(x => this.setState({ wlasnieOdczytanoPracownika: false }))
-                    //     }
-                    //     this.focusPoleTekstoweSkanowania();
-                    // }
                 }, error => {
                     console.log('zapiszPrace error', error)
                     wyswietlKomunikatBledu(error)
                     setIsLoading(false)
                 })
         },
+        poZapisieWprowadzKolejnaPrace: () => {
+            //window.location.assign('/eoffice/react/raportowanie_zakonczonych_prac/index.html');
+            setZlecenieWybrane(null)
+            setGodzinaStart(godzinaEnd)
+            setGodzinaEnd(null)
+            setPrzepracowano(null)
+        }
     }
     const params = {
         isLoading: isLoading,
+        isZapisanoPraceModalOpen,
+        ostatnioZapisanaPraca,
+
         pracownicy,
         pracownik,
         zlecenieWybrane,
-        id_order_production,
         refZlecenie,
 
         elementyLoading,
         elementyZlecenia,
         elementWybrany,
-        id_element,
         refElement,
 
         operacjeLoading,
@@ -290,41 +218,7 @@ export const RaportujZakonczonaPrace = () => {
                 autoClose={6000}
                 hideProgressBar={true}
             />
-            <Modal
-                //onClose={() => setOpenModal(false)}
-                onOpen={() => setOpenModal(true)}
-                open={openModal}
-                //trigger={<Button>Show Modal</Button>}
-            >
-                <Modal.Header>Zapisano pracę</Modal.Header>
-                {/* <Modal.Content image>
-                    <Image size='medium' src='https://react.semantic-ui.com/images/avatar/large/rachel.png' wrapped />
-                    <Modal.Description>
-                        <Header>Default Profile Image</Header>
-                        <p>
-                            We've found the following gravatar image associated with your e-mail
-                            address.
-          </p>
-                        <p>Is it okay to use this photo?</p>
-                    </Modal.Description>
-                </Modal.Content> */}
-                <Modal.Actions>
-                    <Button
-                        content="OK, zapisz kolejną pracę"
-                        labelPosition='right'
-                        icon='checkmark'
-                        onClick={() => { 
-                            setOpenModal(false); 
-                            window.location.assign('/eoffice/react/raportowanie_zakonczonych_prac/index.html');}}
-                        positive
-                    />
-                    <Button color='black' onClick={() => {
-                        setOpenModal(false);
-                        window.location.assign('/eoffice/production/raport_prac_zakonczonych.xml?action=list&refreshTree=false&go=false&changetree=false');}}>
-                        Powrót do listy
-                    </Button>
-                </Modal.Actions>
-            </Modal>
+            <ZapisanoPraceModal params={params} callbacks={callbacks} />
         </IntlProvider>
     )
 }

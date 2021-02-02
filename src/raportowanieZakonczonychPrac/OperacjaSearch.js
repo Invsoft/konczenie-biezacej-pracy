@@ -7,7 +7,9 @@ import { StatusInfo } from "./StatusInfo";
 export const OperacjaSearch = ({ params, callbacks }) => {
     const { isLoading, operacjeLoading, operacje, operacjaWybrana, refOperacja } = params;
     const [searchText, setSearchText] = React.useState('')
-
+    React.useEffect(() => {
+        if (!operacjaWybrana) setSearchText('')
+    }, [operacjaWybrana])
     const handleSearchChange = (e, { value }) => {
         //setSearchText(value)
     }

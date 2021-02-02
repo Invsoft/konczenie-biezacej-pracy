@@ -7,6 +7,9 @@ import { StatusInfo} from "./StatusInfo";
 export const ElementSearch = ({ params, callbacks }) => {
     const { isLoading, elementyLoading, elementyZlecenia, elementWybrany, refElement } = params;
     const [searchText, setSearchText] = React.useState('')
+    React.useEffect(() => {
+        if (!elementWybrany) setSearchText('')
+    }, [elementWybrany])
 
     const handleSearchChange = (e, { value }) => {
         //setSearchText(value)
