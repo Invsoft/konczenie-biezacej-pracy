@@ -156,7 +156,8 @@ export const RaportujZakonczonaPrace = () => {
         },
         poZapisieWprowadzKolejnaPrace: () => {
             //window.location.assign('/eoffice/react/raportowanie_zakonczonych_prac/index.html');
-            setZlecenieWybrane(null)
+            //setZlecenieWybrane(null)
+            setElementWybrany(null)
             setGodzinaStart(godzinaEnd)
             setGodzinaEnd(null)
             setPrzepracowano(null)
