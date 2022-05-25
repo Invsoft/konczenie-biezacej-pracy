@@ -84,6 +84,10 @@ export const RaportujZakonczonaPrace = () => {
         const myJson = await response.json();
         setElementyLoading(false)
         setElementyZlecenia(myJson)
+        if (myJson.length > 0) {
+            // domyslne wybranie glowego elementu
+            //setElementWybrany(myJson[myJson.length-1])
+        }
         refElement.current.tryOpen()
     }
 

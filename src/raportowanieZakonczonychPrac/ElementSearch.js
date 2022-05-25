@@ -9,6 +9,7 @@ export const ElementSearch = ({ params, callbacks }) => {
     const [searchText, setSearchText] = React.useState('')
     React.useEffect(() => {
         if (!elementWybrany) setSearchText('')
+        else setSearchText(elementWybrany.object_index + ' ' + elementWybrany.title)
     }, [elementWybrany])
 
     const handleSearchChange = (e, { value }) => {
@@ -17,7 +18,7 @@ export const ElementSearch = ({ params, callbacks }) => {
     }
     const onSelect = (element) => {
         callbacks.wybierzElement(element)
-        setSearchText(element.object_index +' '+ element.title)
+        //setSearchText(element.object_index +' '+ element.title)
     }
     const clearSelection = () => {
         callbacks.wybierzElement(null)
