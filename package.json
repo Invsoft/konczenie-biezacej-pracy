@@ -1,8 +1,8 @@
 {
-  "name": "raportowanie-zakonczonych-prac",
-  "homepage": "http://proedims:8080/eoffice/react/raportowanie_zakonczonych_prac",
+  "name": "konczenie-biezacej-pracy",
+  "homepage": "http://proedims:8080/eoffice/react/konczenie_biezacej_pracy",
   "proxy": "http://proedims:8080",
-  "version": "1.0.2",
+  "version": "0.0.1",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.4",
