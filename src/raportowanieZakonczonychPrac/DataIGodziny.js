@@ -27,7 +27,7 @@ export const GodzinaRozpoczecia = ({ params, callbacks }) => {
     const { data, godzinaStart, godzinaEnd, przepracowano } = params;
 
     const handleGodzinaRozpoczecia = (czas) => {
-        console.log('wybierzGodzineRozpoczecia', czas)
+        //console.log('wybierzGodzineRozpoczecia', czas)
         if (!moment.isMoment(czas)) {
             callbacks.wybierzGodzineRozpoczecia(null)
             callbacks.wybierzPrzepracowano(momentZERO())
@@ -125,7 +125,11 @@ export const GodzinaZakonczenia = ({ params, callbacks }) => {
                 disabledMinutes={przepracowanoDisabledMinutes}
                 onSelect={handlePrzepracowano}
                 onChange={handlePrzepracowano} value={przepracowano} />
-            <StatusInfo poprawneDane={godzinaEnd} />
+            <StatusInfo poprawneDane={godzinaEnd && !godzinaPozniejszaOdBiezacej(data, godzinaEnd)} />
+            {
+                godzinaPozniejszaOdBiezacej(data, godzinaEnd) &&
+                <span style={{ color: "red" }}>Godzina zakończenia późniejsza od bieżącej</span>
+            }
         </div>
     )
 }
@@ -175,4 +179,16 @@ function disabledHours(data) {
 function przepracowanoDisabledMinutes(selectedHour) {
     if (selectedHour === 0) return [0,1];
     return [];
+}
+
+/**
+ * Test if time is after now.
+ * @param {moment} dzien - The Moment object containing testing date.
+ * @param {moment} czas - The Moment object containing testing time.
+ * @return {boolean} True if dzien + czas is after now
+ */
+function godzinaPozniejszaOdBiezacej(dzien, czas) {
+    if (!moment.isMoment(dzien) || !moment.isMoment(czas)) return false
+    const now = moment()
+    return now.isBefore(moment(dzien.format("yyyy-MM-DD") + " " + czas.format("HH:mm")))
 }

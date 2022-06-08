@@ -6,7 +6,8 @@ import {RaportujZakonczonaPrace} from './raportowanieZakonczonychPrac/RaportujZa
 
 function App() {
   return (
-    <div className="App" data_build_version={packageJson.version} data_build_time={preval`module.exports = new Date().toISOString();`}>
+    <div className="App" data_build_version={packageJson.version} data_build_time={preval`module.exports = new Date().toISOString();`}
+      data_wiki="https://github.com/ar-insoft/raportowanie-zakonczonych-prac/wiki">
       <RaportujZakonczonaPrace/>
     </div>
   );

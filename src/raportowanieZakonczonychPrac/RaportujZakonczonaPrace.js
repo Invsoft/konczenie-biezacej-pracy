@@ -111,7 +111,7 @@ export const RaportujZakonczonaPrace = () => {
             // if (index > -1) {
             //     setPracownik(pracownicy[index])
             // }
-            console.log('wybierzPracownika ', pracownik)
+            //console.log('wybierzPracownika ', pracownik)
             setPracownik(pracownik)
             if (pracownik) document.getElementById('zlecenie_search').focus()
         },
@@ -148,12 +148,12 @@ export const RaportujZakonczonaPrace = () => {
                     end_task_time: godzinaEnd.format("HH:mm") + ":00",
                 },
                 fromServer => {
-                    console.log('zapiszPrace fromServer', fromServer)
+                    //console.log('zapiszPrace fromServer', fromServer)
                     setZapisanoPraceModalOpen(true)
                     setOstatnioZapisanaPraca(fromServer.zapisanaPraca)
                     setIsLoading(false)
                 }, error => {
-                    console.log('zapiszPrace error', error)
+                    //console.log('zapiszPrace error', error)
                     wyswietlKomunikatBledu(error)
                     setIsLoading(false)
                 })
