@@ -1,6 +1,5 @@
 import React from 'react';
 import { Form, Button, Table, Container, Segment } from 'semantic-ui-react'
-import 'semantic-ui-css/semantic.min.css'
 import './PanelSemantic.css'
 import classNames from 'classnames/bind'
 import _ from 'lodash'
