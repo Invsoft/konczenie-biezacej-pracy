@@ -10,17 +10,13 @@ import { ElementSearch } from './ElementSearch'
 import { OperacjaSearch } from "./OperacjaSearch";
 import { Dzien, GodzinaRozpoczecia, GodzinaZakonczenia } from "./DataIGodziny";
 //import { StatusInfo } from "./StatusInfo";
-//import { DatePicker, TimePicker } from 'antd';
 //mport 'antd/dist/antd.css';
 import { from } from 'rxjs';
 
 export const PanelSemantic = ({ params, callbacks }) => {
-    const { isLoading, pracownik, id_order_production, id_element, operacjaWybrana, moznaZapisac } = params;
+    const { isLoading, pracownik, zlecenieWybrane, elementWybrany, operacjaWybrana, moznaZapisac } = params;
     const pracownikOdczytany = pracownik;
-    const zlecenieOdczytane = id_order_production > 0;
-    const elementOdczytany = id_element > 0;
-    const operacjaOdczytana = operacjaWybrana;
-    //console.log('PanelSemantic callbacks', callbacks)
+    //console.log('PanelSemantic elementWybrany', elementWybrany)
     return (
         <Container textAlign='center'>
             <Form autoComplete="off" loading={isLoading}>
@@ -40,8 +36,7 @@ export const PanelSemantic = ({ params, callbacks }) => {
                                     {
                                         'niepoprawne_dane': false,
                                     })}>
-                                    {/* {pracownikOdczytany ? raportujZlecenie.getEmployeeFulname() : <Tlumaczenia id="brak" />} */}
-                                        <PracownikSearch params={params} callbacks={callbacks}/>
+                                        {pracownikOdczytany && pracownikOdczytany.surname + ' ' + pracownikOdczytany.name}
                                 </Table.Cell>
                             </Table.Row>
                             <Table.Row key='zlecenie'>
@@ -52,8 +47,8 @@ export const PanelSemantic = ({ params, callbacks }) => {
                                     {
                                         'niepoprawne_dane': false,
                                     })}>
-                                    {/* {zlecenieOdczytane ? raportujZlecenie.zlecenieOpis() : <Tlumaczenia id="brak" />} */}
-                                        <ZlecenieSearch params={params} callbacks={callbacks}/>
+                                        {zlecenieWybrane && zlecenieWybrane.object_index + ' ' + zlecenieWybrane.title}
+                                        {/* <ZlecenieSearch params={params} callbacks={callbacks}/> */}
                                 </Table.Cell>
                             </Table.Row>
                             <Table.Row key='element'>
@@ -64,20 +59,20 @@ export const PanelSemantic = ({ params, callbacks }) => {
                                     {
                                         'niepoprawne_dane': false,
                                     })}>
-                                    {/* {elementOdczytany ? raportujZlecenie.elementOpis() : <Tlumaczenia id="brak" />} */}
-                                        <ElementSearch params={params} callbacks={callbacks} />
+                                        {elementWybrany && elementWybrany.object_index + ' ' + elementWybrany.title }
+                                        {/* <ElementSearch params={params} callbacks={callbacks} /> */}
                                 </Table.Cell>
                             </Table.Row>
                             <Table.Row key='operacja'>
                                 <Table.Cell width={1}>
-                                    <Tlumaczenia id="Operacja technologiczna" />
+                                    <Tlumaczenia id="Operacja" />
                                 </Table.Cell>
                                 <Table.Cell width={3} className={classNames(
                                     {
                                         'niepoprawne_dane': false,
                                     })}>
-                                    {/* <ListaOperacji raportujZlecenie={raportujZlecenie} onChange={this.handleChange} /> */}
-                                        <OperacjaSearch params={params} callbacks={callbacks} />
+                                        {/* <OperacjaSearch params={params} callbacks={callbacks} /> */}
+                                        {operacjaWybrana && operacjaWybrana.title }
                                 </Table.Cell>
                             </Table.Row>
                             <Table.Row key='data'>

@@ -9,13 +9,13 @@ export const OperacjaSearch = ({ params, callbacks }) => {
     const [searchText, setSearchText] = React.useState('')
     React.useEffect(() => {
         if (!operacjaWybrana) setSearchText('')
+        else setSearchText(operacjaWybrana.title)
     }, [operacjaWybrana])
     const handleSearchChange = (e, { value }) => {
         //setSearchText(value)
     }
     const onSelect = (operacja) => {
-        callbacks.wybierzOperacje(operacja)
-        setSearchText(operacja.value)
+        callbacks.wybierzOperacje(operacja)        
     }
     const clearSelection = () => {
         callbacks.wybierzOperacje(null)

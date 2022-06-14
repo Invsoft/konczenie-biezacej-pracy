@@ -1,5 +1,5 @@
 export const consts = {
-    ENDPOINT_URL: '/eoffice/production/raportowanie_zakonczonych_prac/raportowanie_zakonczonych_prac_json_endpoint.xml',
+    ENDPOINT_URL: '/eoffice/production/konczenie_biezacej_pracy/konczenie_biezacej_pracy_json_endpoint.xml',
 }
 
 export const DataProvider = {

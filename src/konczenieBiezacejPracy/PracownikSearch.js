@@ -9,6 +9,10 @@ export const PracownikSearch = ({ params, callbacks }) => {
     const [pracownicyFilter, setPracownicyFilter] = React.useState(pracownicy)
     React.useEffect(() => { filrtujPracownikow(pracownicy, '')}, [pracownicy])
     const [searchText, setSearchText] = React.useState('')
+    React.useEffect(() => {
+        if (pracownik) setSearchText(pracownik.surname + ' ' + pracownik.name)
+        else setSearchText('') 
+    }, [pracownik])
 
     const filrtujPracownikow = (pracownicy, filterText) => {
         const re = new RegExp(_.escapeRegExp(filterText), 'i')
@@ -25,7 +29,7 @@ export const PracownikSearch = ({ params, callbacks }) => {
 
     const onSelect = (pracownik) => {
         console.log('PracownikSearch onSelect', pracownik, callbacks)
-        setSearchText(pracownik.surname + ' ' + pracownik.name)
+        //setSearchText(pracownik.surname + ' ' + pracownik.name)
         callbacks.wybierzPracownika(pracownik)
     }
     const clearSelection = () => {

@@ -3,35 +3,31 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { IntlProvider } from 'react-intl'
 //import _ from 'lodash'
-import './RaportujZakonczonaPrace.css'
-import { messagesOf } from './../tools/i18nConfig'
+import './KonczenieBiezacejPracy.css'
+import { messagesOf } from '../tools/i18nConfig'
 import { consts, DataProvider } from './DataProvider'
 import { PanelSemantic } from './PanelSemantic';
 import { ZapisanoPraceModal } from './ZapisanoPraceModal'
 //import { from } from 'rxjs';
 
-export const RaportujZakonczonaPrace = () => {
+export const KonczenieBiezacejPracy = () => {
     const parsedUrl = new URL(window.location.href)
     const lang = parsedUrl.searchParams.get("lang") || "pl"
+    const idPracaDoZakonczenia = parsedUrl.searchParams.get("id") || "160548388"
 
     const [isLoading, setIsLoading] = useState(false)
     const [isZapisanoPraceModalOpen, setZapisanoPraceModalOpen] = React.useState(false)
     const [ostatnioZapisanaPraca, setOstatnioZapisanaPraca] = useState(null)
     //const [zapisanePrace, setZapisanePrace] = useState([])
 
-    const [pracownicy, setPracownicy] = useState([])
     const [pracownik, setPracownik] = useState(null)
 
     const [zlecenieWybrane, setZlecenieWybrane] = useState(null)
     const refZlecenie = useRef(null);
 
-    const [elementyLoading, setElementyLoading] = useState(false)
-    const [elementyZlecenia, setElementyZlecenia] = useState([])
     const [elementWybrany, setElementWybrany] = useState(null)
     const refElement = useRef(null);
 
-    const [operacjeLoading, setOperacjeLoading] = useState(false)
-    const [operacje, setOperacje] = useState([])
     const [operacjaWybrana, setOperacjaWybrana] = useState(null)
     const refOperacja = useRef(null);
 
@@ -44,62 +40,42 @@ export const RaportujZakonczonaPrace = () => {
     const [moznaZapisac, setMoznaZapisac] = useState(false)
 
     useEffect(() => {
-        loadPracownicy()
+        //loadPracownicy()
+        loadPracaDoZakonczenia()
     }, [])
-    useEffect(() => {
-        setElementyZlecenia([])
-        setElementWybrany(null)
-        setOperacje([])
-        setOperacjaWybrana(null)
-        if (zlecenieWybrane && zlecenieWybrane.id > 0)
-            loadElementyZlecenia(zlecenieWybrane.id)
-    }, [zlecenieWybrane])
-    useEffect(() => {
-        setOperacje([])
-        setOperacjaWybrana(null)
-        if (zlecenieWybrane && zlecenieWybrane.id > 0 && elementWybrany)
-            loadOperacje(zlecenieWybrane.id, elementWybrany.id)
-    }, [zlecenieWybrane, elementWybrany])
-    useEffect(() => {
-        const zdefiniowaneObiekty = pracownik && pracownik.id > 0 && operacjaWybrana && data && godzinaStart && godzinaEnd
-        const canSave = !!zdefiniowaneObiekty
-        //console.log('canSave', canSave)
-        setMoznaZapisac(canSave)
-    }, [pracownik, operacjaWybrana, data, godzinaStart, godzinaEnd])
+    // useEffect(() => {
+    //     setElementyZlecenia([])
+    //     setElementWybrany(null)
+    //     setOperacje([])
+    //     setOperacjaWybrana(null)
+    //     if (zlecenieWybrane && zlecenieWybrane.id > 0)
+    //         loadElementyZlecenia(zlecenieWybrane.id)
+    // }, [zlecenieWybrane])
+    // useEffect(() => {
+    //     setOperacje([])
+    //     setOperacjaWybrana(null)
+    //     if (zlecenieWybrane && zlecenieWybrane.id > 0 && elementWybrany)
+    //         loadOperacje(zlecenieWybrane.id, elementWybrany.id)
+    // }, [zlecenieWybrane, elementWybrany])
+    // useEffect(() => {
+    //     const zdefiniowaneObiekty = pracownik && pracownik.id > 0 && operacjaWybrana && data && godzinaStart && godzinaEnd
+    //     const canSave = !!zdefiniowaneObiekty
+    //     //console.log('canSave', canSave)
+    //     setMoznaZapisac(canSave)
+    // }, [pracownik, operacjaWybrana, data, godzinaStart, godzinaEnd])
 
-    async function loadPracownicy() {
+    async function loadPracaDoZakonczenia() {
         setIsLoading(true)
-        const jsonName = consts.ENDPOINT_URL + '?action=pobierz_pracownikow_json'
+        const jsonName = consts.ENDPOINT_URL + `?action=pobierz_rozpoczeta_prace_json&id=${idPracaDoZakonczenia}`
         const response = await fetch(jsonName);
         const myJson = await response.json();
-        //console.log('myJson', myJson)
+
+        setPracownik(myJson.employee)
+        setZlecenieWybrane(myJson.orderProduction)
+        setElementWybrany(myJson.element)
+        setOperacjaWybrana(myJson.operation)
+        
         setIsLoading(false)
-        setPracownicy(myJson)
-    }
-
-    async function loadElementyZlecenia(id_order_production) {
-        setElementyLoading(true)
-        const jsonName = consts.ENDPOINT_URL + '?action=pobierz_elementy_zlecenia_json&id_order_production=' + id_order_production
-        const response = await fetch(jsonName);
-        const myJson = await response.json();
-        setElementyLoading(false)
-        setElementyZlecenia(myJson)
-        if (myJson.length > 0) {
-            // domyslne wybranie glowego elementu
-            //setElementWybrany(myJson[myJson.length-1])
-        }
-        refElement.current.tryOpen()
-    }
-
-    async function loadOperacje(id_order_production, id_element) {
-        setOperacjeLoading(true)
-        const jsonName = consts.ENDPOINT_URL + '?action=pobierz_operacje_zlecenia_json&id_order_production=' + id_order_production +
-            '&id_element=' + id_element
-        const response = await fetch(jsonName);
-        const myJson = await response.json();
-        setOperacjeLoading(false)
-        setOperacje(myJson)
-        refOperacja.current.tryOpen()
     }
 
     const callbacks = {
@@ -172,18 +148,13 @@ export const RaportujZakonczonaPrace = () => {
         isZapisanoPraceModalOpen,
         ostatnioZapisanaPraca,
 
-        pracownicy,
         pracownik,
         zlecenieWybrane,
         refZlecenie,
 
-        elementyLoading,
-        elementyZlecenia,
         elementWybrany,
         refElement,
 
-        operacjeLoading,
-        operacje,
         operacjaWybrana,
         refOperacja,
 
@@ -213,7 +184,7 @@ export const RaportujZakonczonaPrace = () => {
         <IntlProvider locale={lang} messages={messagesOf(lang)}>
             <div className="mainPanel">
                 <header id="main_header">
-                    Raportuj zakończoną pracę
+                    Kończenie bieżącej pracy
                 </header>
                 <PanelSemantic params={params} callbacks={callbacks} />
             </div>
