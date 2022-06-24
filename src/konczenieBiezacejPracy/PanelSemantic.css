@@ -33,6 +33,15 @@ div.fields_group_niepoprawne_dane>.search_field>div.ui>input {
     justify-content: center;
 }
 
+.wybrana_data_zakonczenia {
+    min-height: 30px;
+    margin: 0 10px 0 20px;
+    font-weight: bold;
+    color:darkgreen;
+    display: flex;
+    align-items: center;
+}
+
 .zlecenie_fields{
     display: flex;
     align-items: center;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { IntlProvider } from 'react-intl'
@@ -13,7 +13,7 @@ import { ZapisanoPraceModal } from './ZapisanoPraceModal'
 export const KonczenieBiezacejPracy = () => {
     const parsedUrl = new URL(window.location.href)
     const lang = parsedUrl.searchParams.get("lang") || "pl"
-    const idPracaDoZakonczenia = parsedUrl.searchParams.get("id") || "160548388"
+    const idPracaDoZakonczenia = parsedUrl.searchParams.get("id") || "184777746"
 
     const [isLoading, setIsLoading] = useState(false)
     const [isZapisanoPraceModalOpen, setZapisanoPraceModalOpen] = React.useState(false)
@@ -21,21 +21,12 @@ export const KonczenieBiezacejPracy = () => {
     //const [zapisanePrace, setZapisanePrace] = useState([])
 
     const [pracownik, setPracownik] = useState(null)
-
-    const [zlecenieWybrane, setZlecenieWybrane] = useState(null)
-    const refZlecenie = useRef(null);
-
-    const [elementWybrany, setElementWybrany] = useState(null)
-    const refElement = useRef(null);
-
+    const [zlecenie, setZlecenie] = useState(null)
+    const [element, setElement] = useState(null)
     const [operacjaWybrana, setOperacjaWybrana] = useState(null)
-    const refOperacja = useRef(null);
+    const [pracaDoZakonczenia, setPracaDoZakonczenia] = useState(null)
 
-    const [data, setData] = useState(null)
-    const refDate = useRef(null);
-    const [godzinaStart, setGodzinaStart] = useState(null)
-    const [godzinaEnd, setGodzinaEnd] = useState(null)
-    const [przepracowano, setPrzepracowano] = useState(null)
+    const [dataGodzinaZakonczenia, setDataGodzinaZakonczenia] = useState(null)
 
     const [moznaZapisac, setMoznaZapisac] = useState(false)
 
@@ -43,26 +34,6 @@ export const KonczenieBiezacejPracy = () => {
         //loadPracownicy()
         loadPracaDoZakonczenia()
     }, [])
-    // useEffect(() => {
-    //     setElementyZlecenia([])
-    //     setElementWybrany(null)
-    //     setOperacje([])
-    //     setOperacjaWybrana(null)
-    //     if (zlecenieWybrane && zlecenieWybrane.id > 0)
-    //         loadElementyZlecenia(zlecenieWybrane.id)
-    // }, [zlecenieWybrane])
-    // useEffect(() => {
-    //     setOperacje([])
-    //     setOperacjaWybrana(null)
-    //     if (zlecenieWybrane && zlecenieWybrane.id > 0 && elementWybrany)
-    //         loadOperacje(zlecenieWybrane.id, elementWybrany.id)
-    // }, [zlecenieWybrane, elementWybrany])
-    // useEffect(() => {
-    //     const zdefiniowaneObiekty = pracownik && pracownik.id > 0 && operacjaWybrana && data && godzinaStart && godzinaEnd
-    //     const canSave = !!zdefiniowaneObiekty
-    //     //console.log('canSave', canSave)
-    //     setMoznaZapisac(canSave)
-    // }, [pracownik, operacjaWybrana, data, godzinaStart, godzinaEnd])
 
     async function loadPracaDoZakonczenia() {
         setIsLoading(true)
@@ -71,9 +42,10 @@ export const KonczenieBiezacejPracy = () => {
         const myJson = await response.json();
 
         setPracownik(myJson.employee)
-        setZlecenieWybrane(myJson.orderProduction)
-        setElementWybrany(myJson.element)
+        setZlecenie(myJson.orderProduction)
+        setElement(myJson.element)
         setOperacjaWybrana(myJson.operation)
+        setPracaDoZakonczenia(myJson.startedWork)
         
         setIsLoading(false)
     }
@@ -81,47 +53,16 @@ export const KonczenieBiezacejPracy = () => {
     const callbacks = {
         setLoadind: (loading) => setIsLoading(loading),
         setZapisanoPraceModalOpen: (open) => setZapisanoPraceModalOpen(open),
-        wybierzPracownika: (pracownik) => {
-            // console.log('wybierzPracownika id', id)
-            // const index = _.findIndex(pracownicy, { 'id': id });
-            // if (index > -1) {
-            //     setPracownik(pracownicy[index])
-            // }
-            //console.log('wybierzPracownika ', pracownik)
-            setPracownik(pracownik)
-            if (pracownik) document.getElementById('zlecenie_search').focus()
-        },
-        wybierzZlecenie: (zlecenie) => {
-            setZlecenieWybrane(zlecenie)
-        },
-        wybierzElement: (element) => {
-            setElementWybrany(element)
-        },
-        wybierzOperacje: (operacja) => {
-            setOperacjaWybrana(operacja)
-            refDate.current.focus()
-        },
-        wybierzDate: (dzien) => {
-            setData(dzien)
-        },
-        wybierzGodzineRozpoczecia: (czas) => {
-            setGodzinaStart(czas)
-        },
-        wybierzGodzineZakonczenia: (czas) => {
-            setGodzinaEnd(czas)
-        },
-        wybierzPrzepracowano: (czas) => {
-            setPrzepracowano(czas)
+        wybierzDataGodzinaZakonczenia: czasString => {
+            setDataGodzinaZakonczenia(czasString)
+            setMoznaZapisac(czasString != null)
         },
         zapiszPrace: () => {
             setIsLoading(true)
             DataProvider.wyslijNaSerwer(
                 {
-                    employeeId: pracownik.id,
-                    operacjaId: operacjaWybrana.id,
-                    date: data.format("yyyy-MM-DD"),
-                    start_task_time: godzinaStart.format("HH:mm") + ":00",
-                    end_task_time: godzinaEnd.format("HH:mm") + ":00",
+                    pracaDoZakonczenia: pracaDoZakonczenia.id,
+                    dataGodzinaZakonczenia: dataGodzinaZakonczenia,
                 },
                 fromServer => {
                     //console.log('zapiszPrace fromServer', fromServer)
@@ -134,13 +75,8 @@ export const KonczenieBiezacejPracy = () => {
                     setIsLoading(false)
                 })
         },
-        poZapisieWprowadzKolejnaPrace: () => {
-            //window.location.assign('/eoffice/react/raportowanie_zakonczonych_prac/index.html');
-            //setZlecenieWybrane(null)
-            setElementWybrany(null)
-            setGodzinaStart(godzinaEnd)
-            setGodzinaEnd(null)
-            setPrzepracowano(null)
+        poZapisieZakoncz: () => {
+            window.parent.act('list');
         }
     }
     const params = {
@@ -149,20 +85,12 @@ export const KonczenieBiezacejPracy = () => {
         ostatnioZapisanaPraca,
 
         pracownik,
-        zlecenieWybrane,
-        refZlecenie,
-
-        elementWybrany,
-        refElement,
-
+        zlecenie: zlecenie,
+        elementWybrany: element,
         operacjaWybrana,
-        refOperacja,
+        pracaDoZakonczenia,
 
-        refDate,
-        data,
-        godzinaStart,
-        godzinaEnd,
-        przepracowano,
+        dataGodzinaZakonczenia,
 
         moznaZapisac,
     }

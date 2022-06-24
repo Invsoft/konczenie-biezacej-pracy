@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 import './App.css';
 import packageJson from './../package.json';
 import preval from 'preval.macro';

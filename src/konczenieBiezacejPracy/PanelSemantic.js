@@ -1,20 +1,17 @@
 import React from 'react';
-import { Form, Button, Table, Container, Segment } from 'semantic-ui-react'
+import { Form, Button, Table, Container, Segment, Icon } from 'semantic-ui-react'
 import './PanelSemantic.css'
 import classNames from 'classnames/bind'
 import _ from 'lodash'
 import { Tlumaczenia } from '../tools/Tlumaczenia'
-import { PracownikSearch} from "./PracownikSearch";
-import { ZlecenieSearch } from './ZlecenieSearch' 
-import { ElementSearch } from './ElementSearch'
-import { OperacjaSearch } from "./OperacjaSearch";
-import { Dzien, GodzinaRozpoczecia, GodzinaZakonczenia } from "./DataIGodziny";
+import { GodzinaZakonczenia } from "./DataIGodziny";
 //import { StatusInfo } from "./StatusInfo";
 //mport 'antd/dist/antd.css';
 import { from } from 'rxjs';
+import saveIcon from '../assets/save.svg';
 
 export const PanelSemantic = ({ params, callbacks }) => {
-    const { isLoading, pracownik, zlecenieWybrane, elementWybrany, operacjaWybrana, moznaZapisac } = params;
+    const { isLoading, pracownik, zlecenie, elementWybrany, operacjaWybrana, pracaDoZakonczenia, dataGodzinaZakonczenia, moznaZapisac } = params;
     const pracownikOdczytany = pracownik;
     //console.log('PanelSemantic elementWybrany', elementWybrany)
     return (
@@ -47,7 +44,7 @@ export const PanelSemantic = ({ params, callbacks }) => {
                                     {
                                         'niepoprawne_dane': false,
                                     })}>
-                                        {zlecenieWybrane && zlecenieWybrane.object_index + ' ' + zlecenieWybrane.title}
+                                        {zlecenie && zlecenie.object_index + ' ' + zlecenie.title}
                                         {/* <ZlecenieSearch params={params} callbacks={callbacks}/> */}
                                 </Table.Cell>
                             </Table.Row>
@@ -77,18 +74,11 @@ export const PanelSemantic = ({ params, callbacks }) => {
                             </Table.Row>
                             <Table.Row key='data'>
                                 <Table.Cell>
-                                        Data{/* <Tlumaczenia id="Data" /> */}
+                                        Rozpoczęcie pracy {/* <Tlumaczenia id="Data" /> */}
                                 </Table.Cell>
                                 <Table.Cell>
-                                        <Dzien params={params} callbacks={callbacks} />
-                                </Table.Cell>
-                            </Table.Row>
-                            <Table.Row key='godzina_start'>
-                                <Table.Cell>
-                                    Godzina rozpoczęcia
-                                </Table.Cell>
-                                <Table.Cell>
-                                        <GodzinaRozpoczecia params={params} callbacks={callbacks} />
+                                        {/* {<Dzien params={params} callbacks={callbacks} />} */}
+                                        {pracaDoZakonczenia && pracaDoZakonczenia.start_datetime.substring(0,16) }
                                 </Table.Cell>
                             </Table.Row>
                             <Table.Row key='data_czas'>
@@ -105,8 +95,9 @@ export const PanelSemantic = ({ params, callbacks }) => {
                                     <Table.HeaderCell colSpan='2'>{/*  colSpan='2' */}
                                         {/* {moznaZapisac ? 'moznaZapisac' : 'NIEmoznaZapisac'} */}
                                         <Button color='teal' fluid size='large' disabled={!moznaZapisac} loading={isLoading} 
-                                            onClick={(evt) => callbacks.zapiszPrace()}
-                                            >Zapisz</Button>                                    
+                                            onClick={(evt) => callbacks.zapiszPrace()}>
+                                                Zakończ pracę
+                                            </Button>                                    
                                 </Table.HeaderCell>
                             </Table.Row>
                             {/* <Table.Row key='prace'>
