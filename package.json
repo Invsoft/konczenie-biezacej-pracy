@@ -2,7 +2,7 @@
   "name": "konczenie-biezacej-pracy",
   "homepage": "http://proedims:8080/eoffice/react/konczenie_biezacej_pracy",
   "proxy": "http://proedims:8080",
-  "version": "0.8.3",
+  "version": "0.8.4",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.4",
