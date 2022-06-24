@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.8.3](https://github.com/Invsoft/konczenie-biezacej-pracy/compare/v0.0.2...v0.8.3) (2022-06-24)
+
 ### 0.0.2 (2022-06-22)
 
 ### [1.0.2](https://github.com/ar-insoft/raportowanie-zakonczonych-prac/compare/v1.0.1...v1.0.2) (2021-02-12)
