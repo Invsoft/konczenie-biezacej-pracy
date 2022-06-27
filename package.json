@@ -2,7 +2,7 @@
   "name": "konczenie-biezacej-pracy",
   "homepage": "http://proedims:8080/eoffice/react/konczenie_biezacej_pracy",
   "proxy": "http://proedims:8080",
-  "version": "0.8.5",
+  "version": "1.0.1",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.4",
@@ -27,6 +27,7 @@
     "test": "react-scripts test",
     "send-build-to-proedims": "send-build-to-proedims",
     "prebuild": "standard-version",
+    "standard-check-style": "npx standard",
     "check-env": "node -e console.log(process.env)"
   },
   "eslintConfig": {
@@ -48,6 +49,7 @@
     ]
   },
   "devDependencies": {
+    "standard": "^17.0.0",
     "standard-version": "^9.1.0"
   }
 }
