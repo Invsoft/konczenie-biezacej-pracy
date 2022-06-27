@@ -1,14 +1,14 @@
-import './App.css';
-import packageJson from './../package.json';
-import preval from 'preval.macro';
+import './App.css'
+import packageJson from './../package.json'
+import preval from 'preval.macro'
 import { KonczenieBiezacejPracy } from './konczenieBiezacejPracy/KonczenieBiezacejPracy'
 
-function App() {
+function App () {
   return (
-    <div className="App" data_build_version={packageJson.version} data_build_time={preval`module.exports = new Date().toISOString();`}>
+    <div className='App' data_build_version={packageJson.version} data_build_time={preval`module.exports = new Date().toISOString();`}>
       <KonczenieBiezacejPracy />
     </div>
-  );
+  )
 }
 
-export default App;
+export default App

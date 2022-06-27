@@ -1,0 +1,8 @@
+
+2022-06-27
+Dodanie pól
+- Dokument przekazania (ProductionWorkplace productionWorkplace.setDocument(document))
+- Komentarz (ProductionWorkplace productionWorkplace.setComment(comment))
+- Numer seryjny (operation.zapiszNumerSeryjnyDoProductOrComponent)
+
+Obsługa błędów połączenia i serwera
